@@ -9,10 +9,11 @@ class Doctor extends Model
 {
     use HasFactory;
 
-    // protected $fillable = [
-    //     'product_name',
-    //     'product_description',
-    //     'price',
-    //     'quantity',
-    // ];
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'address',
+        'specialization',
+    ];
 }
