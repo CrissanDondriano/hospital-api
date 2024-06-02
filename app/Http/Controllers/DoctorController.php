@@ -14,39 +14,41 @@ class DoctorController extends Controller
     }
 
     public function store(Request $request){
-        $products = Product::create([
-            'product_name' => $request->product_name,
-            'product_description' => $request->product_description,
-            'price' => $request->price,
-            'quantity' => $request->quantity,
+        $doctors = Doctor::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'specialization' => $request->specialization,
         ]);
-        return response()->json($products, 201);
+        return response()->json($doctors, 201);
     }
 
     public function show($id){
-        $products = Product::find($id);
-        return response()->json($products, 200);
+        $doctors = Doctor::find($id);
+        return response()->json($doctors, 200);
     }
 
-    public function search($product_name){
-        $products = Product::with('user')->where('product_name', 'like', '%' . $product_name . '%')->get();
-        return response()->json($products, 200);        
-    }
+    // public function search($name){
+    //     $doctors = Doctor::with('doctor')->where('name', 'like', '%' . $name . '%')->get();
+    //     return response()->json($doctors, 200);        
+    // }
 
     public function update(Request $request, $id){
-        $products = Product::find($id);
-        $products->update([
-            'product_name' => $request->product_name,
-            'product_description' => $request->product_description,
-            'price' => $request->price,
-            'quantity' => $request->quantity,
+        $doctors = Doctor::find($id);
+        $doctors->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'specialization' => $request->specialization,
         ]);
-        return response()->json($products, 200);
+        return response()->json($doctors, 200);
     }
 
     public function destroy($id){
-        $products = Product::find($id);
-        $products->delete();
+        $doctors = Doctor::find($id);
+        $doctors->delete();
         return response()->json(null, 204);
     }
 }
