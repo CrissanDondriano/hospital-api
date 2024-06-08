@@ -44,7 +44,8 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
-        ]);
+            'message' => 'User registered successfully'
+        ], 201);
     }
 
     /**
@@ -55,20 +56,23 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json([
-                'message' => 'Invalid login details'
-            ], 401);
-        }
-
-        $user = User::where('email', $request['email'])->firstOrFail();
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
         ]);
+
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            $user = Auth::user();
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([ 
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user_id' => $user->id
+            ], 201);
+        }
+        
+        return response()->json(['message' => 'Invalid username or password'], 401);
     }
 
     public function logout(Request $request)
