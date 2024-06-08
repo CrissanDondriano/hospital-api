@@ -9,13 +9,11 @@ class AppointmentController extends Controller
 {
     public function index()
     {
-        $this->authorize('viewAny', Appointment::class);
         return Appointment::all();
     }
 
     public function store(Request $request)
     {
-        $this->authorize('create', Appointment::class);
         $validated = $request->validate([
             'doctor_id' => 'required|exists:doctors,id',
             'patient_id' => 'required|exists:patients,id',
@@ -24,15 +22,14 @@ class AppointmentController extends Controller
         return Appointment::create($validated);
     }
 
-    public function show(Appointment $appointment)
+    public function show($id)
     {
-        $this->authorize('view', $appointment);
-        return $appointment;
+        return Appointment::findOrFail($id);
     }
 
-    public function update(Request $request, Appointment $appointment)
+    public function update(Request $request, $id)
     {
-        $this->authorize('update', $appointment);
+        $appointment = Appointment::findOrFail($id);
         $validated = $request->validate([
             'doctor_id' => 'sometimes|required|exists:doctors,id',
             'patient_id' => 'sometimes|required|exists:patients,id',
@@ -42,11 +39,10 @@ class AppointmentController extends Controller
         return $appointment;
     }
 
-    public function destroy(Appointment $appointment)
+    public function destroy($id)
     {
-        $this->authorize('delete', $appointment);
+        $appointment = Appointment::findOrFail($id);
         $appointment->delete();
         return response()->noContent();
     }
 }
-

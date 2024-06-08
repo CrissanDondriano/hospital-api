@@ -9,42 +9,43 @@ class MedicalRecordController extends Controller
 {
     public function index()
     {
-        $this->authorize('viewAny', MedicalRecord::class);
         return MedicalRecord::all();
     }
 
     public function store(Request $request)
     {
-        $this->authorize('create', MedicalRecord::class);
         $validated = $request->validate([
             'patient_id' => 'required|exists:patients,id',
             'description' => 'required|string',
             'date' => 'required|date',
         ]);
+
         return MedicalRecord::create($validated);
     }
 
-    public function show(MedicalRecord $record)
+    public function show($id)
     {
-        $this->authorize('view', $record);
-        return $record;
+        return MedicalRecord::findOrFail($id);
     }
 
-    public function update(Request $request, MedicalRecord $record)
+    public function update(Request $request, $id)
     {
-        $this->authorize('update', $record);
+        $record = MedicalRecord::findOrFail($id);
         $validated = $request->validate([
             'description' => 'sometimes|required|string',
             'date' => 'sometimes|required|date',
         ]);
+
         $record->update($validated);
+
         return $record;
     }
 
-    public function destroy(MedicalRecord $record)
+    public function destroy($id)
     {
-        $this->authorize('delete', $record);
+        $record = MedicalRecord::findOrFail($id);
         $record->delete();
+
         return response()->noContent();
     }
 }

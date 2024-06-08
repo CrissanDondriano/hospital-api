@@ -71,7 +71,7 @@ class AuthController extends Controller
                 'user_id' => $user->id
             ], 201);
         }
-        
+
         return response()->json(['message' => 'Invalid username or password'], 401);
     }
 
@@ -83,4 +83,15 @@ class AuthController extends Controller
             'message' => 'Logged out'
         ]);
     }
+
+    public function user(Request $request, $id)
+    {
+        $user = User::find($id);
+        if ($user) {
+            return response()->json($user);
+        } else {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+    }
+
 }

@@ -7,43 +7,49 @@ use Illuminate\Http\Request;
 
 class DoctorController extends Controller
 {
+    // Get all doctors
     public function index()
     {
-        $this->authorize('viewAny', Doctor::class);
         return Doctor::all();
     }
 
+    // Create a new doctor
     public function store(Request $request)
     {
-        $this->authorize('create', Doctor::class);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:doctors',
         ]);
+
         return Doctor::create($validated);
     }
 
-    public function show(Doctor $doctor)
+    // Get a single doctor
+    public function show($id)
     {
-        $this->authorize('view', $doctor);
-        return $doctor;
+        return Doctor::findOrFail($id);
     }
 
-    public function update(Request $request, Doctor $doctor)
+    // Update a doctor
+    public function update(Request $request, $id)
     {
-        $this->authorize('update', $doctor);
+        $doctor = Doctor::findOrFail($id);
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|string|email|max:255|unique:doctors,email,' . $doctor->id,
         ]);
+
         $doctor->update($validated);
+
         return $doctor;
     }
 
-    public function destroy(Doctor $doctor)
+    // Delete a doctor
+    public function destroy($id)
     {
-        $this->authorize('delete', $doctor);
+        $doctor = Doctor::findOrFail($id);
         $doctor->delete();
+
         return response()->noContent();
     }
 }
