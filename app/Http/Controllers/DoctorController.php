@@ -2,53 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Doctor;
+use Illuminate\Http\Request;
 
 class DoctorController extends Controller
 {
-    
-    public function index() {
-        $doctors = Doctor::all();
-        return response()->json($doctors);
+    public function index()
+    {
+        $this->authorize('viewAny', Doctor::class);
+        return Doctor::all();
     }
 
-    public function store(Request $request){
-        $doctors = Doctor::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'address' => $request->address,
-            'specialization' => $request->specialization,
+    public function store(Request $request)
+    {
+        $this->authorize('create', Doctor::class);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:doctors',
         ]);
-        return response()->json($doctors, 201);
+        return Doctor::create($validated);
     }
 
-    public function show($id){
-        $doctors = Doctor::find($id);
-        return response()->json($doctors, 200);
+    public function show(Doctor $doctor)
+    {
+        $this->authorize('view', $doctor);
+        return $doctor;
     }
 
-    // public function search($name){
-    //     $doctors = Doctor::with('doctor')->where('name', 'like', '%' . $name . '%')->get();
-    //     return response()->json($doctors, 200);        
-    // }
-
-    public function update(Request $request, $id){
-        $doctors = Doctor::find($id);
-        $doctors->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'address' => $request->address,
-            'specialization' => $request->specialization,
+    public function update(Request $request, Doctor $doctor)
+    {
+        $this->authorize('update', $doctor);
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|string|email|max:255|unique:doctors,email,' . $doctor->id,
         ]);
-        return response()->json($doctors, 200);
+        $doctor->update($validated);
+        return $doctor;
     }
 
-    public function destroy($id){
-        $doctors = Doctor::find($id);
-        $doctors->delete();
-        return response()->json(null, 204);
+    public function destroy(Doctor $doctor)
+    {
+        $this->authorize('delete', $doctor);
+        $doctor->delete();
+        return response()->noContent();
     }
 }

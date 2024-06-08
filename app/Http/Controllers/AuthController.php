@@ -38,8 +38,13 @@ class AuthController extends Controller
             'password' => Hash::make($request->password), // hash the password before storing it in the database
         ]);
 
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         // a message that returns when the user is successfully registered
-        return response()->json(['message' => 'User registered successfully'], 201);
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]);
     }
 
     /**
@@ -50,21 +55,28 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        // validate is predefine method in Laravel to validate the request data
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
-
-        // the Auth::attempt is pre-defined method in Laravel to authenticate the user
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            $user = Auth::user();
-            $token = $user->createToken('token-name')->plainTextToken;
-
-            return response()->json(['token' => $token, 'user_id' => $user->id], 201);
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response()->json([
+                'message' => 'Invalid login details'
+            ], 401);
         }
 
-        // Authentication failed
-        return response()->json(['message' => 'Invalid username or password'], 401);
+        $user = User::where('email', $request['email'])->firstOrFail();
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->tokens()->delete();
+
+        return response()->json([
+            'message' => 'Logged out'
+        ]);
     }
 }
