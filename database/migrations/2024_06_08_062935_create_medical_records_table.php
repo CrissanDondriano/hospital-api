@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('medical_records', function (Blueprint $table) {
             $table->id();
             $table->foreignId('patient_id')->constrained('patients');
+            $table->string('patient_name'); 
             $table->text('description');
             $table->date('date');
             $table->timestamps();
