@@ -22,12 +22,10 @@ class DoctorController extends Controller
             'email' => 'required|string|email|max:255|unique:doctors',
         ]);
 
-        $randomPassword = Str::random(8);
-
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($randomPassword), 
+            'password' => Hash::make('admin'), 
             'role' => 'doctor',
         ]);
 
@@ -38,7 +36,6 @@ class DoctorController extends Controller
         return response()->json([
             'doctor' => $doctor,
             'user' => $user,
-            'password' => $randomPassword, 
         ]);
     }
 
