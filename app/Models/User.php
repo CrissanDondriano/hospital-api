@@ -17,9 +17,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+          'name', 'email', 'password', 'role'
     ];
 
     /**
@@ -44,22 +42,22 @@ class User extends Authenticatable
     public function isAdmin() {
         return $this->role === 'admin';
     }
-    
+
     public function isDoctor() {
         return $this->role === 'doctor';
     }
-    
+
     public function isPatient() {
         return $this->role === 'patient';
     }
-    
-    public function patients()
+
+    public function patient()
     {
-        return $this->hasMany(Patient::class);
+        return $this->hasOne(Patient::class);
     }
 
-    public function doctors()
+    public function doctor()
     {
-        return $this->hasMany(Doctor::class);
+        return $this->hasOne(Doctor::class);
     }
 }

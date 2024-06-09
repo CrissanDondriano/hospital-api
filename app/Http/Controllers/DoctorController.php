@@ -4,16 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Doctor;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DoctorController extends Controller
 {
-    // Get all doctors
     public function index()
     {
         return Doctor::all();
     }
 
-    // Create a new doctor
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -21,22 +22,37 @@ class DoctorController extends Controller
             'email' => 'required|string|email|max:255|unique:doctors',
         ]);
 
-        return Doctor::create($validated);
+        $randomPassword = Str::random(8);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($randomPassword), 
+            'role' => 'doctor',
+        ]);
+
+        $validated['user_id'] = $user->id;
+
+        $doctor = Doctor::create($validated);
+
+        return response()->json([
+            'doctor' => $doctor,
+            'user' => $user,
+            'password' => $randomPassword, 
+        ]);
     }
 
-    // Get a single doctor
     public function show($id)
     {
         return Doctor::findOrFail($id);
     }
 
-    // Update a doctor
     public function update(Request $request, $id)
     {
         $doctor = Doctor::findOrFail($id);
         $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255|unique:doctors,email,' . $doctor->id,
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:doctors,email,' . $doctor->id,
         ]);
 
         $doctor->update($validated);
@@ -44,7 +60,6 @@ class DoctorController extends Controller
         return $doctor;
     }
 
-    // Delete a doctor
     public function destroy($id)
     {
         $doctor = Doctor::findOrFail($id);
