@@ -15,11 +15,13 @@ return new class extends Migration
     {
         Schema::create('medical_records', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('patient_id')->constrained('patients');
+            $table->unsignedBigInteger('patient_id');
             $table->string('patient_name'); 
             $table->text('description');
             $table->date('date');
             $table->timestamps();
+
+            $table->foreign('patient_id')->references('user_id')->on('patients')->onDelete('cascade');
         });
     }
 

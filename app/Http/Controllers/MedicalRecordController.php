@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MedicalRecord;
-use App\Models\User;
+use App\Models\Patient;
 use Illuminate\Http\Request;
 
 class MedicalRecordController extends Controller
@@ -21,10 +21,10 @@ class MedicalRecordController extends Controller
             'date' => 'required|date',
         ]);
 
-        $patient = User::whereRaw('LOWER(name) = ?', [strtolower($validated['patient_name'])])->firstOrFail();
+        $patient = Patient::whereRaw('LOWER(name) = ?', [strtolower($validated['patient_name'])])->firstOrFail();
 
         $record = MedicalRecord::create([
-            'patient_id' => $patient->id,
+            'patient_id' => $patient->user_id,
             'patient_name' => $patient->name,
             'description' => $validated['description'],
             'date' => $validated['date'],
@@ -49,8 +49,8 @@ class MedicalRecordController extends Controller
         ]);
 
         if (isset($validated['patient_name'])) {
-            $patient = User::whereRaw('LOWER(name) = ?', [strtolower($validated['patient_name'])])->firstOrFail();
-            $record->patient_id = $patient->id;
+            $patient = Patient::whereRaw('LOWER(name) = ?', [strtolower($validated['patient_name'])])->firstOrFail();
+            $record->patient_id = $patient->user_id;
             $record->patient_name = $patient->name;
         }
 
