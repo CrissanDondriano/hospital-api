@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
-use App\Models\Doctor;
-use App\Models\Patient;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
@@ -22,8 +21,8 @@ class AppointmentController extends Controller
             'date' => 'required|date',
         ]);
 
-        $doctor = Doctor::whereRaw('LOWER(name) = ?', [strtolower($validated['doctor_name'])])->firstOrFail();
-        $patient = Patient::whereRaw('LOWER(name) = ?', [strtolower($validated['patient_name'])])->firstOrFail();
+        $doctor = User::whereRaw('LOWER(name) = ?', [strtolower($validated['doctor_name'])])->firstOrFail();
+        $patient = User::whereRaw('LOWER(name) = ?', [strtolower($validated['patient_name'])])->firstOrFail();
 
         $appointment = Appointment::create([
             'doctor_id' => $doctor->id,
@@ -52,13 +51,13 @@ class AppointmentController extends Controller
         ]);
 
         if (isset($validated['doctor_name'])) {
-            $doctor = Doctor::whereRaw('LOWER(name) = ?', [strtolower($validated['doctor_name'])])->firstOrFail();
+            $doctor = User::whereRaw('LOWER(name) = ?', [strtolower($validated['doctor_name'])])->firstOrFail();
             $appointment->doctor_id = $doctor->id;
             $appointment->doctor_name = $doctor->name;
         }
 
         if (isset($validated['patient_name'])) {
-            $patient = Patient::whereRaw('LOWER(name) = ?', [strtolower($validated['patient_name'])])->firstOrFail();
+            $patient = User::whereRaw('LOWER(name) = ?', [strtolower($validated['patient_name'])])->firstOrFail();
             $appointment->patient_id = $patient->id;
             $appointment->patient_name = $patient->name;
         }
