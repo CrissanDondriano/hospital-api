@@ -10,7 +10,13 @@ class MedicalRecordController extends Controller
 {
     public function index()
     {
-        return MedicalRecord::all();
+        $records = MedicalRecord::all();
+        $patients = Patient::all();
+
+        return response()->json([
+            'records' => $records,
+            'patients' => $patients
+        ]);
     }
 
     public function store(Request $request)

@@ -11,8 +11,15 @@ class AppointmentController extends Controller
 {
     public function index()
     {
-        return Appointment::all();
-
+        $appointments = Appointment::all();
+        $doctors = Doctor::all();
+        $patients = Patient::all();
+    
+        return response()->json([
+            'appointments' => $appointments,
+            'doctors' => $doctors,
+            'patients' => $patients
+        ]);
     }
 
     public function store(Request $request)
