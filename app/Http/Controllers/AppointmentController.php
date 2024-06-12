@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\User;
 use App\Models\Doctor;
 use App\Models\Patient;
 use Illuminate\Http\Request;
@@ -14,25 +15,28 @@ class AppointmentController extends Controller
         $appointments = Appointment::all();
         $doctors = Doctor::all();
         $patients = Patient::all();
-    
+
         return response()->json([
             'appointments' => $appointments,
             'doctors' => $doctors,
-            'patients' => $patients
+            'patients' => $patients,
         ]);
     }
 
     public function store(Request $request)
     {
+        // Validate the incoming request data
         $validated = $request->validate([
-            'doctor_name' => 'required|string',
-            'patient_name' => 'required|string',
+            'doctor_id' => 'required|exists:doctors,id',
+            'patient_id' => 'required|exists:patients,id',
             'date' => 'required|date',
         ]);
-
-        $doctor = Doctor::whereRaw('LOWER(name) = ?', [strtolower($validated['doctor_name'])])->firstOrFail();
-        $patient = Patient::whereRaw('LOWER(name) = ?', [strtolower($validated['patient_name'])])->firstOrFail();
-
+    
+        // Retrieve the doctor and patient from the database
+        $doctor = Doctor::findOrFail($validated['doctor_id']);
+        $patient = Patient::findOrFail($validated['patient_id']);
+    
+        // Create the appointment with the user_ids of doctor and patient
         $appointment = Appointment::create([
             'doctor_id' => $doctor->user_id,
             'patient_id' => $patient->user_id,
@@ -40,10 +44,11 @@ class AppointmentController extends Controller
             'patient_name' => $patient->name,
             'date' => $validated['date'],
         ]);
-
-        return $appointment;
+    
+        return response()->json($appointment, 201);
     }
-
+    
+    
     public function show($id)
     {
         return Appointment::findOrFail($id);
